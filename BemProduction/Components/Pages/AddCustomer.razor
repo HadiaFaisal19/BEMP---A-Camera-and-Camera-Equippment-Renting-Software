@@ -1,0 +1,50 @@
+﻿<h3>AddCustomer</h3>
+@page "/addcustomer"
+@using ClassLibraryModel
+@using ClassLibraryDal
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Forms
+@inject IJSRuntime JSRuntime
+@rendermode InteractiveServer
+
+<h2>Add New Customer</h2>
+
+<EditForm Model="newCustomer" OnValidSubmit="HandleSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="CNIC">CNIC:</label>
+        <InputText id="CustomerCNIC" @bind-Value=" newCustomer.CustomerCNIC" class="form-control" />
+    </div><div class="form-group">
+        <label for=" CustomerName"> CustomerName:</label>
+        <InputText id=" CustomerName" @bind-Value=" newCustomer. CustomerName" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label for=" CustomerContact"> CustomerContact:</label>
+        <InputText id=" CustomerContact" @bind-Value=" newCustomer. CustomerContact" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label for="ReferenceName">ReferenceName:</label>
+        <InputTextArea id="ReferenceName" @bind-Value=" newCustomer.ReferenceName" class="form-control ReferenceName-box" />
+    </div>
+    <div class="form-group">
+        <label for="Dob">Dob:</label>
+        <InputNumber id="Dob" @bind-Value=" newCustomer.Dob" class="form-control" />
+    </div><div class="form-group">
+        <label for="Dob">Dob:</label>
+        <InputNumber id="Dob" @bind-Value=" newCustomer.Dob" class="form-control" />
+    </div>
+    
+
+    <div class="button-container">
+        <button class="submit-button" type="submit">Add Customer</button>
+    </div>
+</EditForm>
+
+
+@code {
+    private Customer  newCustomer = new Customer();
+
+    
+}

@@ -1,0 +1,77 @@
+﻿@page "/addproduct"
+@using ClassLibraryModel
+@using ClassLibraryDal
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Forms
+@inject IJSRuntime JSRuntime
+@rendermode InteractiveServer
+
+<h2>Add New Product</h2>
+
+<EditForm Model="newProduct" OnValidSubmit="HandleSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="Name">Name:</label>
+        <InputText id="Name" @bind-Value="newProduct.Name" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label for="Category">Category:</label>
+        <InputSelect id="Category" @bind-Value="newProduct.Category" class="form-control">
+            <option value="">Select Category</option>
+            <option value="Camera">Camera</option>
+            <option value="Lens">Lens</option>
+            <option value="Gimbles">Gimbles</option>
+            <option value="Light">Light</option>
+            <option value="Others">Others</option>
+        </InputSelect>
+    </div>
+    <div class="form-group">
+        <label for="Brand">Brand:</label>
+        <InputText id="Brand" @bind-Value="newProduct.Brand" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label for="Description">Description:</label>
+        <InputTextArea id="Description" @bind-Value="newProduct.Description" class="form-control description-box" />
+    </div>
+    <div class="form-group">
+        <label for="Price">Price:</label>
+        <InputNumber id="Price" @bind-Value="newProduct.Price" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Available:</label>
+        <InputRadioGroup @bind-Value="newProduct.IsAvailable">
+            <div class="radio-group">
+                <InputRadio id="AvailableYes" Value="true" /> Yes
+                <InputRadio id="AvailableNo" Value="false" /> No
+            </div>
+        </InputRadioGroup>
+    </div>
+
+    <div class="button-container">
+        <button class="submit-button" type="submit">Add Product</button>
+    </div>
+</EditForm>
+
+
+@code {
+    private Product newProduct = new Product();
+
+    private async Task HandleSubmit()
+    {
+        if (string.IsNullOrEmpty(newProduct.Name) || newProduct.Price <= 0)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "Please enter complete details");
+            return;
+        }
+
+        List<Product> existingProducts = DalProductDetails.GetAllProducts();
+        bool existingProduct = existingProducts.Any(p => p.Name == newProduct.Name && p.Price == newProduct.Price);
+        
+            DalProductDetails.AddProduct(newProduct);
+            await JSRuntime.InvokeVoidAsync("alert", "Product added successfully");
+            newProduct = new Product(); // Reset the form
+        
+    }
+}
