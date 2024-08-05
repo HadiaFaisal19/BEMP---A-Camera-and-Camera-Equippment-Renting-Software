@@ -6,7 +6,7 @@ namespace ClassLibraryModel
     {
         [Key]
         public string CustomerCnic { get; set; }
-        public required string CustomerName { get; set; }
+        public string CustomerName { get; set; }
         public string CustomerContact { get; set; }
 
         public string ReferenceName { get; set; }
@@ -14,7 +14,7 @@ namespace ClassLibraryModel
 
         public string PictureUrl { get; set; }
 
-        public DateOnly Dob { get; set; }
+        public DateTime Dob { get; set; }
     }
 }
 

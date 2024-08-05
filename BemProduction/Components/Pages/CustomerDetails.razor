@@ -1,13 +1,196 @@
-﻿@page "/customers"
+﻿@page "/customerdetails"
+@using ClassLibraryModel
+@using ClassLibraryDal
 @rendermode InteractiveServer
-
+@using Microsoft.AspNetCore.Components
 @inject NavigationManager Navigation
+@using System.Data.SqlClient
 
-<h3>CustomerDetails</h3>
-<button @onclick="NavigateToAddProduct">Add Product</button>
+
+<h2>Customer Details</h2>
+<div class="top-bar">
+    <div class="search-container">
+        <input type="text" placeholder="Search here..." @bind="searchTerm" @oninput="SearchCustomers" />
+    </div>
+    <div class="top-buttons">
+        <button @onclick="NavigateToAddCustomer">Add Customer</button>
+    </div>
+</div>
+
+@if (customers == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var customer in filteredCustomers)
+            {
+                <tr>
+                    <td>@customer.CustomerName</td>
+                    <td>
+                        <button @onclick="() => ViewCustomer(customer.CustomerCnic)">View</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (selectedCustomer != null)
+{
+    <div class="customer-details">
+        <h3>Customer Details</h3>
+        <p><strong>CNIC:</strong> @selectedCustomer.CustomerCnic</p>
+        <p><strong>Name:</strong> @selectedCustomer.CustomerName</p>
+        <p><strong>Contact No.:</strong> @selectedCustomer.CustomerContact</p>
+        <p><strong>Reference Name:</strong> @selectedCustomer.ReferenceName</p>
+        <p><strong>Reference Contact No. :</strong> @selectedCustomer.ReferenceContact</p>
+        <p><strong>Picture:</strong> @selectedCustomer.PictureUrl</p>
+        <button @onclick="DeleteCustomer">Delete</button>
+        <button @onclick="NavigateToUpdateCustomer">Update</button>
+    </div>
+}
+
+<style>
+    h2 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .top-bar {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+
+    .top-buttons {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 20px;
+    }
+
+    .search-container {
+        flex-grow: 1;
+        display: flex;
+    }
+
+    button {
+        margin-right: 10px;
+        padding: 10px 20px;
+        background-color: cornflowerblue;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+    .search-container {
+        display: flex;
+        align-items: center;
+        margin-right: 250px;
+        margin-left: 10px;
+        width: 20%; /* Adjust the width as needed */
+    }
+
+    input[type="text"] {
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        width: 100%;
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .table th, .table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+    .customer-details {
+        margin-top: 10px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+</style>
+
 @code {
-    private void NavigateToAddProduct()
+    private void NavigateToAddCustomer()
     {
-        Navigation.NavigateTo("/addproduct");
+        Navigation.NavigateTo("/addcustomer");
+    }
+
+    private List<Customer> customers;
+    private List<Customer> filteredCustomers;
+    private Customer selectedCustomer;
+    private string searchTerm = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCustomers();
+    }
+
+    private async Task LoadCustomers()
+    {
+        customers = await Task.Run(() => DalCustomer.GetAllCustomers());
+        FilterCustomers();
+        StateHasChanged();
+    }
+
+    private void FilterCustomers()
+    {
+        filteredCustomers = customers
+            .Where(c => string.IsNullOrEmpty(searchTerm) || c.CustomerName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+    }
+
+    private void ViewCustomer(string customerId)
+    {
+        selectedCustomer = DalCustomer.GetCustomerById(customerId);
+        StateHasChanged();
+    }
+
+    private void DeleteCustomer()
+    {
+        if (selectedCustomer != null)
+        {
+            Task.Run(() => DalCustomer.DeleteCustomer(selectedCustomer.CustomerCnic)).Wait();
+            customers = Task.Run(() => DalCustomer.GetAllCustomers()).Result;
+            FilterCustomers();
+            selectedCustomer = null;
+            StateHasChanged();
+        }
+    }
+
+    private void NavigateToUpdateCustomer()
+    {
+        if (selectedCustomer != null)
+        {
+            Navigation.NavigateTo($"/updatecustomer/{selectedCustomer.CustomerCnic}");
+        }
+    }
+
+    private void SearchCustomers(ChangeEventArgs e)
+    {
+        searchTerm = e.Value.ToString();
+        FilterCustomers();
     }
 }

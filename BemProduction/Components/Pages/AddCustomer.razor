@@ -1,5 +1,4 @@
-﻿<h3>AddCustomer</h3>
-@page "/addcustomer"
+﻿@page "/addcustomer"
 @using ClassLibraryModel
 @using ClassLibraryDal
 @using Microsoft.AspNetCore.Components
@@ -14,37 +13,61 @@
     <ValidationSummary />
 
     <div class="form-group">
-        <label for="CNIC">CNIC:</label>
-        <InputText id="CustomerCNIC" @bind-Value=" newCustomer.CustomerCNIC" class="form-control" />
-    </div><div class="form-group">
-        <label for=" CustomerName"> CustomerName:</label>
-        <InputText id=" CustomerName" @bind-Value=" newCustomer. CustomerName" class="form-control" />
+        <label for="CustomerCnic">CNIC:</label>
+        <InputText id="CustomerCnic" @bind-Value="newCustomer.CustomerCnic" class="form-control" />
     </div>
     <div class="form-group">
-        <label for=" CustomerContact"> CustomerContact:</label>
-        <InputText id=" CustomerContact" @bind-Value=" newCustomer. CustomerContact" class="form-control" />
+        <label for="CustomerName">Name:</label>
+        <InputText id="CustomerName" @bind-Value="newCustomer.CustomerName" class="form-control" />
     </div>
     <div class="form-group">
-        <label for="ReferenceName">ReferenceName:</label>
-        <InputTextArea id="ReferenceName" @bind-Value=" newCustomer.ReferenceName" class="form-control ReferenceName-box" />
+        <label for="CustomerContact">Contact:</label>
+        <InputText id="CustomerContact" @bind-Value="newCustomer.CustomerContact" class="form-control" />
     </div>
     <div class="form-group">
-        <label for="Dob">Dob:</label>
-        <InputNumber id="Dob" @bind-Value=" newCustomer.Dob" class="form-control" />
-    </div><div class="form-group">
-        <label for="Dob">Dob:</label>
-        <InputNumber id="Dob" @bind-Value=" newCustomer.Dob" class="form-control" />
+        <label for="ReferenceName">Reference Name:</label>
+        <InputText id="ReferenceName" @bind-Value="newCustomer.ReferenceName" class="form-control" />
     </div>
-    
+    <div class="form-group">
+        <label for="ReferenceContact">Reference Contact:</label>
+        <InputText id="ReferenceContact" @bind-Value="newCustomer.ReferenceContact" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label for="Dob">Date of Birth:</label>
+        <InputDate id="Dob" @bind-Value="newCustomer.Dob" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label for="PictureUrl">Picture URL:</label>
+        <InputText id="PictureUrl" @bind-Value="newCustomer.PictureUrl" class="form-control" />
+    </div>
 
     <div class="button-container">
-        <button class="submit-button" type="submit">Add Customer</button>
+        <button class="btn btn-primary" type="submit">Add Customer</button>
     </div>
 </EditForm>
 
-
 @code {
-    private Customer  newCustomer = new Customer();
+    private Customer newCustomer = new Customer();
 
-    
+    private async Task HandleSubmit()
+    {
+        if (string.IsNullOrEmpty(newCustomer.CustomerName))
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "Please enter complete details");
+            return;
+        }
+
+        List<Customer> existingCustomers = DalCustomer.GetAllCustomers();
+        bool existingCustomer = existingCustomers.Any(c => c.CustomerCnic == newCustomer.CustomerCnic);
+
+        if (existingCustomer)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "Customer with this CNIC already exists");
+            return;
+        }
+
+        DalCustomer.AddCustomer(newCustomer);
+        await JSRuntime.InvokeVoidAsync("alert", "Customer added successfully");
+        newCustomer = new Customer(); // Reset the form
+    }
 }
