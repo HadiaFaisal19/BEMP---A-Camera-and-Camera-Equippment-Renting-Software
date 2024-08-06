@@ -1,11 +1,11 @@
-﻿@page "/customerdetails"
+﻿<!-- CustomerDetails.razor -->
+@page "/customerdetails"
 @using ClassLibraryModel
 @using ClassLibraryDal
 @rendermode InteractiveServer
 @using Microsoft.AspNetCore.Components
 @inject NavigationManager Navigation
 @using System.Data.SqlClient
-
 
 <h2>Customer Details</h2>
 <div class="top-bar">
@@ -37,6 +37,9 @@ else
                     <td>@customer.CustomerName</td>
                     <td>
                         <button @onclick="() => ViewCustomer(customer.CustomerCnic)">View</button>
+                    </td>
+                    <td>
+                        <button @onclick="() => CreateBooking(customer.CustomerCnic)">Create Booking</button>
                     </td>
                 </tr>
             }
@@ -162,6 +165,12 @@ else
             .ToList();
     }
 
+    private void CreateBooking(string customerId)
+    {
+        selectedCustomer = DalCustomer.GetCustomerById(customerId);
+        NavigateToCreateBooking();
+    }
+
     private void ViewCustomer(string customerId)
     {
         selectedCustomer = DalCustomer.GetCustomerById(customerId);
@@ -192,5 +201,13 @@ else
     {
         searchTerm = e.Value.ToString();
         FilterCustomers();
+    }
+
+    private void NavigateToCreateBooking()
+    {
+        if (selectedCustomer != null)
+        {
+            Navigation.NavigateTo($"/createbooking/{selectedCustomer.CustomerCnic}");
+        }
     }
 }

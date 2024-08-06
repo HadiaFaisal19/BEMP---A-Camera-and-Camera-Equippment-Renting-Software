@@ -9,6 +9,8 @@ namespace ClassLibraryModel
     public class Order
     {
         public int Id { get; set; }
+
+        public string CustomerCnic { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public string StartShift { get; set; }
@@ -18,6 +20,6 @@ namespace ClassLibraryModel
         public decimal Discount { get; set; }
         public decimal Total { get; set; }
         public string Remarks { get; set; }
-        public List<Product> Products { get; set; }
+        public List<OrderProduct> ProductList { get; set; }
     }
 }

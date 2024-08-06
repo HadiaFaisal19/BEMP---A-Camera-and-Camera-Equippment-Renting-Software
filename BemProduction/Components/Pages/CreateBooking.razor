@@ -1,0 +1,82 @@
+﻿@page "/createbooking/{customerId}"
+@using ClassLibraryModel
+@using ClassLibraryDal
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+<h3>Create Booking</h3>
+
+@if (customer != null)
+{
+    <p><strong>Customer Name:</strong> @customer.CustomerName</p>
+    <p><strong>Contact:</strong> @customer.CustomerContact</p>
+
+    <EditForm Model="order" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div>
+            <label>Start Date:</label>
+            <InputDate @bind-Value="order.StartDate" />
+        </div>
+        <div>
+            <label>End Date:</label>
+            <InputDate @bind-Value="order.EndDate" />
+        </div>
+        <div>
+            <label>Start Shift:</label>
+            <InputText @bind-Value="order.StartShift" />
+        </div>
+        <div>
+            <label>End Shift:</label>
+            <InputText @bind-Value="order.EndShift" />
+        </div>
+        <div>
+            <label>Sub Total:</label>
+            <InputNumber @bind-Value="order.SubTotal" />
+        </div>
+        <div>
+            <label>Discount:</label>
+            <InputNumber @bind-Value="order.Discount" />
+        </div>
+        <div>
+            <label>Total:</label>
+            <InputNumber @bind-Value="order.Total" />
+        </div>
+        <div>
+            <label>Remarks:</label>
+            <InputTextArea @bind-Value="order.Remarks" />
+        </div>
+
+        <button type="submit">Create Booking</button>
+    </EditForm>
+}
+else
+{
+    <p>Loading...</p>
+}
+
+@code {
+    [Parameter]
+    public string CustomerId { get; set; }
+
+    private Customer customer;
+    private Order order = new Order { Status = "Booked" };
+
+    protected override async Task OnInitializedAsync()
+    {
+        customer = await GetCustomerById(CustomerId); // Fetch the customer by ID
+    }
+
+    private async Task<Customer> GetCustomerById(string id)
+    {
+        // Fetch the customer from the database
+        return await Task.Run(() => DalCustomer.GetCustomerById(id));
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        // Add logic to save the order to the database
+        Console.WriteLine($"Booking created for {customer.CustomerName} with status {order.Status}");
+    }
+}
