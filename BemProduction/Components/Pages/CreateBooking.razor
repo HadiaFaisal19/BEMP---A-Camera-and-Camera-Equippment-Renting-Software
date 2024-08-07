@@ -15,40 +15,90 @@
         <DataAnnotationsValidator />
         <ValidationSummary />
 
-        <div>
+        <div class="form-group">
             <label>Start Date:</label>
-            <InputDate @bind-Value="order.StartDate" />
+            <InputDate @bind-Value="order.StartDate" class="form-control" />
         </div>
-        <div>
-            <label>End Date:</label>
-            <InputDate @bind-Value="order.EndDate" />
-        </div>
-        <div>
+        <div class="form-group">
             <label>Start Shift:</label>
-            <InputText @bind-Value="order.StartShift" />
+            <InputText @bind-Value="order.StartShift" class="form-control" />
         </div>
-        <div>
+        <div class="form-group">
+            <label>End Date:</label>
+            <InputDate @bind-Value="order.EndDate" class="form-control" />
+        </div>
+        
+        <div class="form-group">
             <label>End Shift:</label>
-            <InputText @bind-Value="order.EndShift" />
+            <InputText @bind-Value="order.EndShift" class="form-control" />
         </div>
-        <div>
-            <label>Sub Total:</label>
-            <InputNumber @bind-Value="order.SubTotal" />
+        <div class="form-group">
+            <label for="CameraCategory">Camera:</label>
+            <InputSelect id="CameraCategory" @bind-Value="order.ProductList" class="form-control">
+                <option value="">Select Camera</option>
+                @foreach (var product in cameraProducts)
+                {
+                    <option value="@product.Id">@product.Name</option>
+                }
+            </InputSelect>
         </div>
-        <div>
-            <label>Discount:</label>
-            <InputNumber @bind-Value="order.Discount" />
+        <div class="form-group">
+            <label for="LensCategory">Lens:</label>
+            <InputSelect id="LensCategory" @bind-Value="order.ProductList" class="form-control">
+                <option value="">Select Lens</option>
+                @foreach (var product in lensProducts)
+                {
+                    <option value="@product.Id">@product.Name</option>
+                }
+            </InputSelect>
         </div>
-        <div>
-            <label>Total:</label>
-            <InputNumber @bind-Value="order.Total" />
+        <div class="form-group">
+            <label for="GimbleCategory">Gimble:</label>
+            <InputSelect id="GimbleCategory" @bind-Value="order.ProductList" class="form-control">
+                <option value="">Select Gimble</option>
+                @foreach (var product in gimbleProducts)
+                {
+                    <option value="@product.Id">@product.Name</option>
+                }
+            </InputSelect>
         </div>
-        <div>
+        <div class="form-group">
+            <label for="LightCategory">Light:</label>
+            <InputSelect id="LightCategory" @bind-Value="order.ProductList" class="form-control">
+                <option value="">Select Light</option>
+                @foreach (var product in lightProducts)
+                {
+                    <option value="@product.Id">@product.Name</option>
+                }
+            </InputSelect>
+        </div>
+        <div class="form-group">
+            <label for="OtherCategory">Other:</label>
+            <InputSelect id="OtherCategory" @bind-Value="order.ProductList" class="form-control">
+                <option value="">Select Other</option>
+                @foreach (var product in otherProducts)
+                {
+                    <option value="@product.Id">@product.Name</option>
+                }
+            </InputSelect>
+        </div>
+        <div class="form-group">
             <label>Remarks:</label>
-            <InputTextArea @bind-Value="order.Remarks" />
+            <InputTextArea @bind-Value="order.Remarks" class="form-control" />
         </div>
-
-        <button type="submit">Create Booking</button>
+        <div class="form-group">
+            <label>Sub Total:</label>
+            <InputNumber @bind-Value="order.SubTotal" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label>Discount:</label>
+            <InputNumber @bind-Value="order.Discount" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label>Total:</label>
+            <InputNumber @bind-Value="order.Total" class="form-control" />
+        </div>
+        <button type="submit" class="btn btn-primary">Create Booking</button>
     </EditForm>
 }
 else
@@ -56,22 +106,42 @@ else
     <p>Loading...</p>
 }
 
+
+
 @code {
     [Parameter]
     public string CustomerId { get; set; }
 
     private Customer customer;
+
+
     private Order order = new Order { Status = "Booked" };
+    private List<Product> cameraProducts;
+    private List<Product> lensProducts;
+    private List<Product> gimbleProducts;
+    private List<Product> lightProducts;
+    private List<Product> otherProducts;
 
     protected override async Task OnInitializedAsync()
     {
-        customer = await GetCustomerById(CustomerId); // Fetch the customer by ID
+        customer = await GetCustomerById(CustomerId);
+        var allProducts = await GetAllProducts();
+
+        cameraProducts = allProducts.Where(p => p.Category == "Camera").ToList();
+        lensProducts = allProducts.Where(p => p.Category == "Lens").ToList();
+        gimbleProducts = allProducts.Where(p => p.Category == "Gimble").ToList();
+        lightProducts = allProducts.Where(p => p.Category == "Light").ToList();
+        otherProducts = allProducts.Where(p => p.Category == "Other").ToList();
     }
 
     private async Task<Customer> GetCustomerById(string id)
     {
-        // Fetch the customer from the database
         return await Task.Run(() => DalCustomer.GetCustomerById(id));
+    }
+
+    private async Task<List<Product>> GetAllProducts()
+    {
+        return await Task.Run(() => DalProductDetails.GetAllProducts());
     }
 
     private async Task HandleValidSubmit()

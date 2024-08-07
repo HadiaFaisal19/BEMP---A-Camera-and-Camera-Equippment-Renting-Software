@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <_ContentIncludedByDefault Remove="Components\Pages\AddCustomer.razor" />
+    <_ContentIncludedByDefault Remove="Components\Pages\Bookings.razor" />
     <_ContentIncludedByDefault Remove="Components\Pages\CreateBooking.razor" />
     <_ContentIncludedByDefault Remove="Components\Pages\CustomerDetails.razor" />
     <_ContentIncludedByDefault Remove="Components\Pages\ProductDetails.razor" />
@@ -41,6 +42,10 @@
 
   <ItemGroup>
     <UpToDateCheckInput Remove="Components\Pages\CreateBooking.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Components\Pages\Bookings.razor" />
   </ItemGroup>
 
 </Project>
